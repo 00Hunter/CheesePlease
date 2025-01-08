@@ -5,58 +5,71 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.IntMap;
 
 public class CheesePlease extends Game {
     private SpriteBatch spriteBatch;
-    private Texture MouseTexture;
+    private Sprite MouseSprite;
     private float MouseX;
     private float MouseY;
 
-    private Texture CheeseTexture;
+    private Sprite CheeseSprite;
     private float CheeseX;
     private float CheeseY;
+    private boolean win;
+    private Sprite winTextSprite;
 
-    private Texture FloorTexture;
+    private Sprite FloorSprite;
 
     @Override
     public void render() {
         if(Gdx.input.isTouched()){
-        MouseX++;
-        MouseY++;
+            MouseSprite.translateX(1);
+            MouseSprite.translateY(1);
+
+        }
+
+        Rectangle cheeseRectangle=CheeseSprite.getBoundingRectangle();
+        Rectangle mouseReactangle=MouseSprite.getBoundingRectangle();
+
+        if(cheeseRectangle.contains(mouseReactangle)){
+            win=true;
         }
 
         Gdx.gl.glClearColor(0.8f, 0.8f, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         spriteBatch.begin();
-        spriteBatch.draw(FloorTexture,0,0);
-        spriteBatch.draw(MouseTexture,MouseX,MouseY);
-        spriteBatch.draw(CheeseTexture,CheeseX,CheeseY);
+        FloorSprite.draw(spriteBatch);
+        CheeseSprite.draw(spriteBatch);
+        MouseSprite.draw(spriteBatch);
+
+        if(win){
+            winTextSprite.draw(spriteBatch);
+        }
         spriteBatch.end();
     }
 
     @Override
     public void create() {
         spriteBatch=new SpriteBatch();
-        MouseTexture=new Texture(Gdx.files.internal("Mouse.png"));
-        MouseX=20;
-        MouseY=20;
+        MouseSprite=new Sprite(new Texture(Gdx.files.internal("Mouse.png")));
+        MouseSprite.setPosition(20,20);
 
-        CheeseTexture=new Texture(Gdx.files.internal("cheese.png"));
-        CheeseX=400;
-        CheeseY=400;
+        CheeseSprite=new Sprite(new Texture(Gdx.files.internal("cheese.png")));
+        CheeseSprite.setPosition(200,200);
 
-        FloorTexture=new Texture(Gdx.files.internal("tiles.png"));
-
+        FloorSprite=new Sprite(new Texture(Gdx.files.internal("tiles.png")));
+        winTextSprite=new Sprite(new Texture(Gdx.files.internal("winner.png")));
+        winTextSprite.setPosition(600,600);
+        win =false;
     }
 
     @Override
     public void dispose() {
         spriteBatch.dispose();
-        MouseTexture.dispose();
-        CheeseTexture.dispose();
-        FloorTexture.dispose();
     }
 }
